@@ -80,8 +80,8 @@ const getMonitor = _ =>
                                 img: false,
                                 data: e.text
                             };
+                            break;
                         }
-                        break;
                     }
                 }
                 if (!res) {
