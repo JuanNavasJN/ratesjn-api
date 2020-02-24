@@ -1,0 +1,24 @@
+{
+    "name": "ratesjn-api",
+    "version": "1.0.0",
+    "main": "index.js",
+    "author": "Juan Navas",
+    "license": "MIT",
+    "scripts": {
+        "start": "node index",
+        "dev": "nodemon index"
+    },
+    "dependencies": {
+        "axios": "^0.19.2",
+        "body-parser": "^1.19.0",
+        "cheerio": "^1.0.0-rc.3",
+        "cors": "^2.8.5",
+        "dotenv": "^8.2.0",
+        "express": "^4.17.1",
+        "ocr-space-api": "^1.0.1",
+        "twitter": "^1.7.1"
+    },
+    "devDependencies": {
+        "nodemon": "^2.0.2"
+    }
+}
