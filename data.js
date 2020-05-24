@@ -81,7 +81,6 @@ const fetchMonitor = _ =>
                         let match = data.parsedText.match(/PROMEDIO Bs./gm);
 
                         if (match) {
-                            console.log(e.node);
                             let match2 = data.parsedText.match(
                                 /[0-9]+.[0-9]+[,|.]+[0-9]+/g
                             );
