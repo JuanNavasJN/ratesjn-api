@@ -59,8 +59,9 @@ const username = '';
 const password = '';
 
 const client = new Instagram({ username, password });
+let monitorData = { src: '', value: 0 };
 
-const getMonitor = _ =>
+const fetchMonitor = _ =>
     new Promise(resolve => {
         client
             .getPhotosByUsername({ username: 'enparalelovzla' })
@@ -80,6 +81,7 @@ const getMonitor = _ =>
                         let match = data.parsedText.match(/PROMEDIO Bs./gm);
 
                         if (match) {
+                            console.log(e.node);
                             let match2 = data.parsedText.match(
                                 /[0-9]+.[0-9]+[,|.]+[0-9]+/g
                             );
@@ -98,9 +100,44 @@ const getMonitor = _ =>
                         console.log(e);
                     }
                 }
+                monitorData = result;
+                console.log(
+                    'monitorData updated...',
+                    new Date().toLocaleString('es-VE', {
+                        timeZone: 'America/Caracas',
+                    })
+                );
                 resolve(result);
             });
     });
+
+fetchMonitor();
+
+const cron = require('node-cron');
+
+cron.schedule(
+    '30 9 * * *',
+    () => {
+        console.log('Runing a job at 09:30 at America/Caracas timezone');
+        fetchMonitor();
+    },
+    {
+        timezone: 'America/Caracas',
+    }
+);
+
+cron.schedule(
+    '30 13 * * *',
+    () => {
+        console.log('Runing a job at 13:30 at America/Caracas timezone');
+        fetchMonitor();
+    },
+    {
+        timezone: 'America/Caracas',
+    }
+);
+
+const getMonitor = _ => monitorData;
 
 module.exports = {
     getAirtmRates,

@@ -43,8 +43,8 @@ app.get('/airtm/buy', async (req, res) => {
 });
 
 app.get('/monitor', async (req, res) => {
-    const data = await getMonitor();
-    return res.json(data);
+    // const data = getMonitor;
+    return res.json(getMonitor());
 });
 
 app.get('/dolartoday', async (req, res) => {
