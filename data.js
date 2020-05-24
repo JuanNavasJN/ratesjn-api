@@ -1,6 +1,5 @@
 const axios = require('axios');
 const $ = require('cheerio');
-const Twitter = require('twitter');
 const airtmUrl = 'https://rates.airtm.com';
 const dolarToday = 'https://s3.amazonaws.com/dolartoday/data.json';
 
@@ -22,9 +21,10 @@ const getAirtmRates = _ =>
             let sell = $('.rate--sell', res.data).html();
 
             const data = {
-                buy,
-                general,
-                sell,
+                src: 'https://rates.airtm.com',
+                buy: Number(buy),
+                general: Number(general),
+                sell: Number(sell),
             };
 
             resolve(data);
@@ -50,78 +50,56 @@ const getDolarToday = _ =>
                 newEur[newKey] = eur[key];
             }
 
-            resolve({ USD: newUsd, EUR: newEur });
+            resolve({ src: dolarToday, USD: newUsd, EUR: newEur });
         });
     });
 
+const Instagram = require('instagram-web-api');
+const username = '';
+const password = '';
+
+const client = new Instagram({ username, password });
+
 const getMonitor = _ =>
     new Promise(resolve => {
-        const client = new Twitter({
-            consumer_key: process.env.CONSUMER_KEY,
-            consumer_secret: process.env.CONSUMER_SECRET,
-            access_token_key: process.env.ACCESS_TOKEN_KEY,
-            access_token_secret: process.env.ACCESS_TOKEN_SECRET,
-        });
+        client
+            .getPhotosByUsername({ username: 'enparalelovzla' })
+            .then(async res => {
+                const data = res.user.edge_owner_to_timeline_media.edges;
+                // console.log(data);
+                // thumbnail_src
+                let result = null;
+                for (let e of data) {
+                    // console.log();
+                    let url = e.node.thumbnail_src;
+                    try {
+                        const data = await ocrSpaceApi.parseImageFromUrl(
+                            url,
+                            options
+                        );
+                        let match = data.parsedText.match(/PROMEDIO Bs./gm);
 
-        const params = { screen_name: 'monitordolarvzl' };
-        client.get('statuses/user_timeline', params, async function (
-            error,
-            tweets,
-            response
-        ) {
-            if (!error) {
-                let res = null;
-                for (let i = 0; i < tweets.length; i++) {
-                    let e = tweets[i];
-                    if (!e.retweeted_status) {
-                        let match = e.text.match(/[0-9]+.[0-9]+[,|.]+[0-9]+/g);
                         if (match) {
-                            res = {
-                                img: false,
-                                data: e.text,
-                                value: match[0],
+                            let match2 = data.parsedText.match(
+                                /[0-9]+.[0-9]+[,|.]+[0-9]+/g
+                            );
+
+                            let value = String(match2[0]);
+                            value = value.replace('.', '');
+                            value = value.replace(',', '.');
+
+                            result = {
+                                src: url,
+                                value: Number(value),
                             };
                             break;
                         }
-
-                        if (
-                            e.entities.media &&
-                            e.entities.media.length === 1 &&
-                            e.entities.media[0].media_url_https
-                        ) {
-                            let url = e.entities.media[0].media_url_https;
-                            try {
-                                const data = await ocrSpaceApi.parseImageFromUrl(
-                                    url,
-                                    options
-                                );
-                                let match = data.parsedText.match(
-                                    /PROMEDIO Bs.S/gm
-                                );
-
-                                if (match) {
-                                    let match2 = data.parsedText.match(
-                                        /[0-9]+.[0-9]+[,|.]+[0-9]+/g
-                                    );
-
-                                    res = {
-                                        img: true,
-                                        data: url,
-                                        value: match2[0],
-                                    };
-                                    break;
-                                }
-                            } catch (e) {
-                                console.log(e);
-                            }
-                        }
+                    } catch (e) {
+                        console.log(e);
                     }
                 }
-                resolve(res);
-            } else {
-                console.log(error);
-            }
-        });
+                resolve(result);
+            });
     });
 
 module.exports = {

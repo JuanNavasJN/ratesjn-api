@@ -1,0 +1,17 @@
+version: '3'
+services:
+    backend:
+        image: rates.juannavas.dev
+        build: .
+        container_name: rates.juannavas.dev
+        env_file: .env
+        environment:
+            - NODE_ENV=production
+        labels:
+            - 'traefik.enable=true'
+            - 'traefik.frontend.rule=Host:rates.juannavas.dev'
+            - 'traefik.port=3000'
+networks:
+    default:
+        external:
+            name: traefik
