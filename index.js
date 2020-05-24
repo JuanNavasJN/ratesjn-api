@@ -13,8 +13,6 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
 app.get('/airtm', async (req, res) => {
     const data = await getAirtmRates();
     return res.json(data);
@@ -53,6 +51,8 @@ app.get('/dolartoday', async (req, res) => {
     const data = await getDolarToday();
     return res.json(data);
 });
+
+app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.listen(process.env.PORT, '0.0.0.0', function () {
     console.log('Web Server listening on port ' + process.env.PORT);
