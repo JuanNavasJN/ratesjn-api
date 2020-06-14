@@ -55,6 +55,7 @@ const getDolarToday = (_) =>
     });
 
 const Instagram = require("instagram-web-api");
+
 const username = "";
 const password = "";
 
@@ -63,55 +64,57 @@ let monitorData = { src: "", value: 0 };
 
 const fetchMonitor = (_) =>
     new Promise((resolve) => {
-        client
-            .getPhotosByUsername({ username: "enparalelovzla" })
-            .then(async (res) => {
-                const data = res.user.edge_owner_to_timeline_media.edges;
-                // console.log(data);
-                // thumbnail_src
-                let result = null;
-                for (let e of data) {
-                    // console.log();
-                    let url = e.node.thumbnail_src;
-                    try {
-                        const data = await ocrSpaceApi.parseImageFromUrl(
-                            url,
-                            options
-                        );
-                        let match = data.parsedText.match(/PROMEDIO Bs./gm);
-
-                        if (match) {
-                            let match2 = data.parsedText.match(
-                                /[0-9]+.[0-9]+[,|.]+[0-9]+/g
+        client.login().then((_) => {
+            client
+                .getPhotosByUsername({ username: "enparalelovzla" })
+                .then(async (res) => {
+                    const data = res.user.edge_owner_to_timeline_media.edges;
+                    // console.log(data);
+                    // thumbnail_src
+                    let result = null;
+                    for (let e of data) {
+                        // console.log();
+                        let url = e.node.thumbnail_src;
+                        try {
+                            const data = await ocrSpaceApi.parseImageFromUrl(
+                                url,
+                                options
                             );
+                            let match = data.parsedText.match(/PROMEDIO Bs./gm);
 
-                            let value = String(match2[0]);
-                            value = value.replace(".", "");
-                            value = value.replace(",", ".");
+                            if (match) {
+                                let match2 = data.parsedText.match(
+                                    /[0-9]+.[0-9]+[,|.]+[0-9]+/g
+                                );
 
-                            result = {
-                                src: url,
-                                value: Number(value),
-                            };
-                            break;
+                                let value = String(match2[0]);
+                                value = value.replace(".", "");
+                                value = value.replace(",", ".");
+
+                                result = {
+                                    src: url,
+                                    value: Number(value),
+                                };
+                                break;
+                            }
+                        } catch (e) {
+                            console.log(e);
                         }
-                    } catch (e) {
-                        console.log(e);
                     }
-                }
-                monitorData = result;
-                console.log(
-                    "monitorData updated...",
-                    new Date().toLocaleString("es-VE", {
-                        timeZone: "America/Caracas",
-                    })
-                );
-                resolve(result);
-            })
-            .catch((err) => {
-                console.log("Error JN:");
-                console.log(err);
-            });
+                    monitorData = result;
+                    console.log(
+                        "monitorData updated...",
+                        new Date().toLocaleString("es-VE", {
+                            timeZone: "America/Caracas",
+                        })
+                    );
+                    resolve(result);
+                })
+                .catch((err) => {
+                    console.log("Error JN:");
+                    console.log(err);
+                });
+        });
     });
 
 fetchMonitor();
