@@ -1,27 +1,27 @@
-const axios = require('axios');
-const $ = require('cheerio');
-const airtmUrl = 'https://rates.airtm.com';
-const dolarToday = 'https://s3.amazonaws.com/dolartoday/data.json';
+const axios = require("axios");
+const $ = require("cheerio");
+const airtmUrl = "https://rates.airtm.com";
+const dolarToday = "https://s3.amazonaws.com/dolartoday/data.json";
 
 // OCR
-const ocrSpaceApi = require('ocr-space-api');
+const ocrSpaceApi = require("ocr-space-api");
 
 const options = {
     apikey: process.env.OCR_APIKEY,
-    language: 'spa',
-    imageFormat: 'image/jpg',
+    language: "spa",
+    imageFormat: "image/jpg",
     isOverlayRequired: true,
 };
 
-const getAirtmRates = _ =>
-    new Promise(resolve => {
-        axios.get(airtmUrl).then(res => {
-            let buy = $('.rate--buy', res.data).html();
-            let general = $('.rate--general', res.data).html();
-            let sell = $('.rate--sell', res.data).html();
+const getAirtmRates = (_) =>
+    new Promise((resolve) => {
+        axios.get(airtmUrl).then((res) => {
+            let buy = $(".rate--buy", res.data).html();
+            let general = $(".rate--general", res.data).html();
+            let sell = $(".rate--sell", res.data).html();
 
             const data = {
-                src: 'https://rates.airtm.com',
+                src: "https://rates.airtm.com",
                 buy: Number(buy),
                 general: Number(general),
                 sell: Number(sell),
@@ -31,21 +31,21 @@ const getAirtmRates = _ =>
         });
     });
 
-const getDolarToday = _ =>
-    new Promise(resolve => {
-        axios.get(dolarToday).then(res => {
+const getDolarToday = (_) =>
+    new Promise((resolve) => {
+        axios.get(dolarToday).then((res) => {
             let usd = res.data.USD;
             let eur = res.data.EUR;
             let newUsd = {},
                 newEur = {};
             for (let key in usd) {
-                let newKey = key.replace('_', ' ');
+                let newKey = key.replace("_", " ");
                 newKey = newKey.charAt(0).toUpperCase() + newKey.slice(1);
                 newUsd[newKey] = usd[key];
             }
 
             for (let key in eur) {
-                let newKey = key.replace('_', ' ');
+                let newKey = key.replace("_", " ");
                 newKey = newKey.charAt(0).toUpperCase() + newKey.slice(1);
                 newEur[newKey] = eur[key];
             }
@@ -54,18 +54,18 @@ const getDolarToday = _ =>
         });
     });
 
-const Instagram = require('instagram-web-api');
-const username = '';
-const password = '';
+const Instagram = require("instagram-web-api");
+const username = "";
+const password = "";
 
 const client = new Instagram({ username, password });
-let monitorData = { src: '', value: 0 };
+let monitorData = { src: "", value: 0 };
 
-const fetchMonitor = _ =>
-    new Promise(resolve => {
+const fetchMonitor = (_) =>
+    new Promise((resolve) => {
         client
-            .getPhotosByUsername({ username: 'enparalelovzla' })
-            .then(async res => {
+            .getPhotosByUsername({ username: "enparalelovzla" })
+            .then(async (res) => {
                 const data = res.user.edge_owner_to_timeline_media.edges;
                 // console.log(data);
                 // thumbnail_src
@@ -86,8 +86,8 @@ const fetchMonitor = _ =>
                             );
 
                             let value = String(match2[0]);
-                            value = value.replace('.', '');
-                            value = value.replace(',', '.');
+                            value = value.replace(".", "");
+                            value = value.replace(",", ".");
 
                             result = {
                                 src: url,
@@ -101,42 +101,46 @@ const fetchMonitor = _ =>
                 }
                 monitorData = result;
                 console.log(
-                    'monitorData updated...',
-                    new Date().toLocaleString('es-VE', {
-                        timeZone: 'America/Caracas',
+                    "monitorData updated...",
+                    new Date().toLocaleString("es-VE", {
+                        timeZone: "America/Caracas",
                     })
                 );
                 resolve(result);
+            })
+            .catch((err) => {
+                console.log("Error JN:");
+                console.log(err);
             });
     });
 
 fetchMonitor();
 
-const cron = require('node-cron');
+const cron = require("node-cron");
 
 cron.schedule(
-    '30 9 * * *',
+    "30 9 * * *",
     () => {
-        console.log('Runing a job at 09:30 at America/Caracas timezone');
+        console.log("Runing a job at 09:30 at America/Caracas timezone");
         fetchMonitor();
     },
     {
-        timezone: 'America/Caracas',
+        timezone: "America/Caracas",
     }
 );
 
 cron.schedule(
-    '30 13 * * *',
+    "30 13 * * *",
     () => {
-        console.log('Runing a job at 13:30 at America/Caracas timezone');
+        console.log("Runing a job at 13:30 at America/Caracas timezone");
         fetchMonitor();
     },
     {
-        timezone: 'America/Caracas',
+        timezone: "America/Caracas",
     }
 );
 
-const getMonitor = _ => monitorData;
+const getMonitor = (_) => monitorData;
 
 module.exports = {
     getAirtmRates,
