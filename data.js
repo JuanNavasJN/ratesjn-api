@@ -57,15 +57,9 @@ const getDolarToday = (_) =>
 let monitorData = { src: "", value: 0 };
 
 const Instagram = require("instagram-web-api");
-const username = "";
-const password = "";
+const username = process.env.username;
+const password = process.env.password;
 const client = new Instagram({ username, password });
-
-// client.login().then(() => {
-//     client
-//         .getPhotosByUsername({ username: "enparalelovzla" })
-//         .then(console.log);
-// });
 
 const fetchMonitor = (_) =>
     new Promise((resolve) => {
@@ -73,7 +67,7 @@ const fetchMonitor = (_) =>
             client
                 .getPhotosByUsername({ username: "enparalelovzla" })
                 .then(async (res) => {
-                    console.log("res", res);
+                    // console.log("res", res);
                     const data = res.user.edge_owner_to_timeline_media.edges;
                     // console.log(data);
                     // thumbnail_src
@@ -117,7 +111,7 @@ const fetchMonitor = (_) =>
                     resolve(result);
                 })
                 .catch((err) => {
-                    console.log("Error JN:");
+                    console.log("fetchMonitor - Error:");
                     console.log(err);
                 });
         });
