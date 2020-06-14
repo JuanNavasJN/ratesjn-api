@@ -56,13 +56,15 @@ const getDolarToday = (_) =>
 
 let monitorData = { src: "", value: 0 };
 
+const Instagram = require("instagram-web-api");
+const username = "";
+const password = "";
+const client = new Instagram({ username, password });
+
+client.getPhotosByUsername({ username: "enparalelovzla" }).then(console.log);
+
 const fetchMonitor = (_) =>
     new Promise((resolve) => {
-        const Instagram = require("instagram-web-api");
-        const username = "";
-        const password = "";
-        const client = new Instagram({ username, password });
-
         client
             .getPhotosByUsername({ username: "enparalelovzla" })
             .then(async (res) => {
@@ -115,7 +117,7 @@ const fetchMonitor = (_) =>
             });
     });
 
-fetchMonitor();
+// fetchMonitor();
 
 const cron = require("node-cron");
 
