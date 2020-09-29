@@ -63,13 +63,13 @@ const client = new Instagram({ username, password });
 
 const fetchMonitor = _ =>
     new Promise(resolve => {
-        // console.log("----------------- fetchMonitor------------");
+        console.log("----------------- fetchMonitor------------");
         // client.login().then(() => {
         // console.log("-------------------- login -----------------");
         client
             .getPhotosByUsername({ username: "enparalelovzla" })
             .then(async res => {
-                // console.log("------------- getPhotosByUsername ----------");
+                console.log("------------- getPhotosByUsername ----------");
                 // console.log("res", res);
                 const data = res.user.edge_owner_to_timeline_media.edges;
                 // console.log(data);
