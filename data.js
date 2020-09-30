@@ -125,7 +125,7 @@ const InstaClient = new Insta();
 
 const fetchMonitor = _ =>
     new Promise(async resolve => {
-        console.log("----------------- fetchMonitor 2 ------------");
+        console.log("----------------- fetchMonitor 3 ------------");
         await InstaClient.getCookie();
 
         InstaClient.getImageByUser("enparalelovzla")
