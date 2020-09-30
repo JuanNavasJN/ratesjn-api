@@ -18,6 +18,7 @@
         "express": "^4.17.1",
         "instagram-web-api": "^2.2.0",
         "node-cron": "^2.0.3",
+        "node-insta-web-api": "^1.1.0",
         "ocr-space-api": "^1.0.1",
         "swagger-ui-express": "^4.1.4"
     },
