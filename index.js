@@ -43,8 +43,13 @@ app.get('/airtm/buy', async (req, res) => {
 });
 
 app.get('/monitor', async (req, res) => {
-    // const data = getMonitor;
-    return res.json(getMonitor());
+    const data = getMonitor();
+
+    if(data.value === 0){
+        return res.status(500).json({msg: "Server error", ...data})
+    }else{
+        return res.json(data);
+    }
 });
 
 app.get('/dolartoday', async (req, res) => {
