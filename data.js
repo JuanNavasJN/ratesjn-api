@@ -3,16 +3,6 @@ const $ = require("cheerio");
 const airtmUrl = "https://rates.airtm.com";
 const dolarToday = "https://s3.amazonaws.com/dolartoday/data.json";
 
-// OCR
-const ocrSpaceApi = require("ocr-space-api");
-
-const options = {
-    apikey: process.env.OCR_APIKEY,
-    language: "spa",
-    imageFormat: "image/jpg",
-    isOverlayRequired: true,
-};
-
 const getAirtmRates = _ =>
     new Promise(resolve => {
         axios.get(airtmUrl).then(res => {
@@ -54,169 +44,11 @@ const getDolarToday = _ =>
         });
     });
 
-let monitorData = { src: "", value: 0 };
+// let monitorData = { src: "", value: 0 };
 
 //--------------------------------------
-
-const Instagram = require("instagram-web-api");
-const username = process.env.username;
-const password = process.env.password;
-const client = new Instagram({ username, password });
-
-const fetchMonitor = _ =>
-    new Promise(resolve => {
-        console.log("----------------- fetchMonitor------------");
-        client.login().then(() => {
-        console.log("-------------------- login -----------------");
-        client
-            .getPhotosByUsername({ username: "enparalelovzla" })
-            .then(async res => {
-                console.log("------------- getPhotosByUsername ----------");
-                // console.log("res", res);
-                const data = res.user.edge_owner_to_timeline_media.edges;
-                // console.log(data);
-                // thumbnail_src
-                let result = null;
-                for (let e of data) {
-                    // console.log();
-                    let url = e.node.thumbnail_src;
-                    try {
-                        const data = await ocrSpaceApi.parseImageFromUrl(
-                            url,
-                            options
-                        );
-                        let match = data.parsedText.match(/PROMEDIO Bs./gm);
-
-                        if (match) {
-                            let match2 = data.parsedText.match(
-                                /[0-9]+.[0-9]+[,|.]+[0-9]+/g
-                            );
-
-                            let value = String(match2[0]);
-                            value = value.replace(".", "");
-                            value = value.replace(",", ".");
-
-                            result = {
-                                src: url,
-                                value: Number(value),
-                            };
-                            break;
-                        }
-                    } catch (e) {
-                        console.log(e);
-                    }
-                }
-                monitorData = result;
-                console.log(
-                    "monitorData updated...",
-                    new Date().toLocaleString("es-VE", {
-                        timeZone: "America/Caracas",
-                    })
-                );
-                resolve(result);
-            })
-            .catch(err => {
-                console.log("fetchMonitor - Error:");
-                console.log(err);
-            });
-        });
-    });
-
-//--------------------------------------
-
-// const Insta = require("node-insta-web-api");
-// const InstaClient = new Insta();
-
-// const fetchMonitor = _ =>
-//     new Promise(async resolve => {
-//         console.log("----------------- fetchMonitor 4 ------------");
-//         await InstaClient.getCookie();
-
-//         InstaClient.getImageByUser("enparalelovzla")
-//             .then(async res => {
-//                 console.log("------------- getImageByUser ----------");
-//                 // console.log("res", res);
-//                 const data = res.user.edge_owner_to_timeline_media.edges;
-//                 // console.log(data);
-//                 // thumbnail_src
-//                 let result = null;
-//                 for (let e of data) {
-//                     // console.log();
-//                     let url = e.node.thumbnail_src;
-//                     try {
-//                         const data = await ocrSpaceApi.parseImageFromUrl(
-//                             url,
-//                             options
-//                         );
-//                         let match = data.parsedText.match(/PROMEDIO Bs./gm);
-
-//                         if (match) {
-//                             let match2 = data.parsedText.match(
-//                                 /[0-9]+.[0-9]+[,|.]+[0-9]+/g
-//                             );
-
-//                             let value = String(match2[0]);
-//                             value = value.replace(".", "");
-//                             value = value.replace(",", ".");
-
-//                             result = {
-//                                 src: url,
-//                                 value: Number(value),
-//                             };
-//                             break;
-//                         }
-//                     } catch (e) {
-//                         console.log(e);
-//                     }
-//                 }
-//                 monitorData = result;
-//                 console.log(
-//                     "monitorData updated...",
-//                     new Date().toLocaleString("es-VE", {
-//                         timeZone: "America/Caracas",
-//                     })
-//                 );
-//                 resolve(result);
-//             })
-//             .catch(err => {
-//                 console.log("fetchMonitor - Error:");
-//                 console.log(err);
-//             });
-//         // });
-//     });
-
-//--------------------------------------
-
-fetchMonitor();
-
-const cron = require("node-cron");
-
-cron.schedule(
-    "30 9 * * *",
-    () => {
-        console.log("Runing a job at 09:30 at America/Caracas timezone");
-        fetchMonitor();
-    },
-    {
-        timezone: "America/Caracas",
-    }
-);
-
-cron.schedule(
-    "30 13 * * *",
-    () => {
-        console.log("Runing a job at 13:30 at America/Caracas timezone");
-        fetchMonitor();
-    },
-    {
-        timezone: "America/Caracas",
-    }
-);
-
-const getMonitor = _ => monitorData;
 
 module.exports = {
     getAirtmRates,
     getDolarToday,
-    getMonitor,
 };
