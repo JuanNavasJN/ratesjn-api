@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const { getAirtmRates, getDolarToday, getMonitor } = require("./data");
+const { getAirtmRates, getDolarToday, getBCVRate } = require("./data");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger/swagger.json");
 
@@ -42,18 +42,18 @@ app.get("/airtm/buy", async (req, res) => {
     });
 });
 
-// app.get('/monitor', async (req, res) => {
-//     const data = getMonitor();
-
-//     if(data.value === 0){
-//         return res.status(500).json({msg: "Server error", ...data})
-//     }else{
-//         return res.json(data);
-//     }
-// });
-
 app.get("/dolartoday", async (req, res) => {
     const data = await getDolarToday();
+    return res.json(data);
+});
+
+app.get("/monitor", async (req, res) => {
+    const data = await getBCVRate();
+    return res.json(data);
+});
+
+app.get("/bcv", async (req, res) => {
+    const data = await getBCVRate();
     return res.json(data);
 });
 

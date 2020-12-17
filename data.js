@@ -46,9 +46,26 @@ const getDolarToday = _ =>
 
 // let monitorData = { src: "", value: 0 };
 
-//--------------------------------------
+//--------------- BCV --------------------
 
+const bcvPage = "http://www.bcv.org.ve";
+const getBCVRate = _ =>
+    new Promise(resolve => {
+        axios.get(bcvPage).then(res => {
+            let amount = $("#dolar strong", res.data).html();
+            amount = amount.split(".").join("").split(",").join(".");
+            const data = {
+                src: bcvPage,
+                value: Number(amount),
+            };
+
+            resolve(data);
+        });
+    });
+
+//--------------------
 module.exports = {
     getAirtmRates,
     getDolarToday,
+    getBCVRate,
 };
